@@ -26,17 +26,13 @@ from config import (
     STARTING_TEMP,
 )
 
-from client.util import SensorIn, SensorOut
+from client.util import SensorIn, SensorOut, compute_mean
 from logger.logger import FileAndStoudLogger
 
 logger = FileAndStoudLogger(
     f"Client-{datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}",
     "../../logs/client/",
 )
-
-
-def compute_mean(values: list[float]) -> float:
-    return sum(values) / len(values)
 
 
 async def produce_data(
