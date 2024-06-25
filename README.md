@@ -1,4 +1,4 @@
-# Edge Temperature Regulation Protocol using TCP
+# Edge/Cloud Temperature Regulation Protocol using TCP
 
 This repository contains a client/server module implemented using TCP to regulate the air-conditioning system of an edge device.
 
