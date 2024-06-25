@@ -19,14 +19,11 @@ def compute_ac_adjustment_direct(
 
 
 def compute_ac_adjustment(
-    inside_temps: list[float],
-    outside_temps: list[float],
+    inside_avg: float,
+    outside_avg: float,
     ac_temp: float,
     goal_temp: float,
 ) -> float:
-    inside_avg = np.array(inside_temps).mean()
-    outside_avg = np.array(outside_temps).mean()
-
     if inside_avg < goal_temp - 1:
         if outside_avg < goal_temp:
             ac_temp += 2
