@@ -32,7 +32,7 @@ class SensorIn:
         self.temp_outside_factor = temp_outside_factor
         self.temp_ac_factor = temp_ac_factor
 
-    def timestep(self, temp_outside: float, temp_ac: float):
+    def timestep(self, temp_outside: float, temp_ac: float) -> None:
         self.current_temp = (
             self.current_temp
             + self.temp_outside_factor * temp_outside

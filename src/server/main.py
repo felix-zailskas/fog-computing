@@ -25,16 +25,18 @@ logger = FileAndStoudLogger(
 )
 
 
-async def handle_client(reader, writer):
+async def handle_client(
+    reader: asyncio.streams.StreamReader, writer: asyncio.streams.StreamWriter
+):
     addr = writer.get_extra_info("peername")
-    logger.info(f"Connected to {addr}")
+    logger.info(f"Connected to {addr[0]}:{addr[1]}")
 
     try:
         while True:
             logger.info("Waiting for incoming data")
             incoming_data = await reader.read(16)
             if not incoming_data:
-                logger.info("No data received, reset connection.")
+                logger.info("Invalid package received, resetting connection.")
                 break
 
             incoming_data = struct.unpack("ffff", incoming_data)
@@ -49,7 +51,7 @@ async def handle_client(reader, writer):
             await writer.drain()
 
     except asyncio.CancelledError:
-        logger.info(f"Connection to {addr} closed.")
+        logger.info(f"Connection to {addr[0]}:{addr[1]} closed.")
     finally:
         writer.close()
         await writer.wait_closed()
@@ -58,7 +60,7 @@ async def handle_client(reader, writer):
 async def main():
     server = await asyncio.start_server(handle_client, HOST, PORT)
     addr = server.sockets[0].getsockname()
-    logger.info(f"Serving on {addr}")
+    logger.info(f"Serving on {addr[0]}:{addr[1]}")
 
     async with server:
         await server.serve_forever()

@@ -44,7 +44,7 @@ async def produce_data(
     outside_sensor: SensorOut,
     ac_temp: float,
     queue: asyncio.Queue,
-):
+) -> None:
     while True:
         logger.info(f"Producing {SECONDS_PER_ROUND} more data samples...")
         for _ in range(SECONDS_PER_ROUND):
@@ -65,7 +65,7 @@ async def produce_data(
         await asyncio.sleep(SECONDS_PER_ROUND)
 
 
-async def send_data(queue: asyncio.Queue):
+async def send_data(queue: asyncio.Queue) -> None:
     while True:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             # Establishing connection to server
@@ -105,14 +105,16 @@ async def send_data(queue: asyncio.Queue):
                         logger.info(
                             f"No data received from server. Restarting connection and resending package"
                         )
+                        # Put the dequeued item back to the front of the queue
                         await queue.put(None)
                         queue._queue.rotate(1)
                         queue._queue[0] = item
                         break
-                # TODO: Check for correct Exceptions
                 except Exception as e:
-                    logger.info(f"Connection lost. Err: {str(e)}")
-                    logger.info("Restarting connection and resending package")
+                    logger.info(
+                        f"Connection lost. Err: {str(e)}. Restarting connection and resending package."
+                    )
+                    # Put the dequeued item back to the front of the queue
                     await queue.put(None)
                     queue._queue.rotate(1)
                     queue._queue[0] = item

@@ -1,6 +1,6 @@
 def compute_ac_adjustment_direct(
-    inside_avg: list[float],
-    outside_avg: list[float],
+    inside_avg: float,
+    outside_avg: float,
     alpha: float,
     beta: float,
     goal_temp: float,
