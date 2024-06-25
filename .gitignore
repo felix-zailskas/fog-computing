@@ -50,15 +50,12 @@ bin/
 
 # Env files
 *.env
+!src/client/.env.template.client
+!src/server/.env.template.server
 **/venv/*
 **/.venv/*
 
-# data files to save space
-**/data/*
-!data/scenario*/
-**/checkpoints/*
-**/results/*
-**/img/*
+
 **/logs/*
 
 .python-version

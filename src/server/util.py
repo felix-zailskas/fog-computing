@@ -1,21 +1,11 @@
-import numpy as np
-
-
 def compute_ac_adjustment_direct(
-    inside_temps: list[float],
-    outside_temps: list[float],
+    inside_avg: list[float],
+    outside_avg: list[float],
     alpha: float,
     beta: float,
     goal_temp: float,
 ) -> float:
-    inside_avg = np.array(inside_temps).mean()
-    outside_avg = np.array(outside_temps).mean()
-
-    new_ac_temp = (
-        (goal_temp * (1 + alpha + beta)) - alpha * outside_avg - inside_avg
-    ) / beta
-
-    return new_ac_temp
+    return ((goal_temp * (1 + alpha + beta)) - alpha * outside_avg - inside_avg) / beta
 
 
 def compute_ac_adjustment(

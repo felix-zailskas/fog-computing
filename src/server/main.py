@@ -1,34 +1,55 @@
+import os
+import sys
+
+# Set this file as the realtive path
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+# Append parent directory to the path to import from sibling package
+module_path = os.path.abspath(os.path.join(".."))
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
 import asyncio
+import datetime
 import struct
 
 from config import HOST, PORT
 
-from server import compute_ac_adjustment
+from logger.logger import FileAndStoudLogger
+from server.util import compute_ac_adjustment
+
+logger = FileAndStoudLogger(
+    f"Server-{datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}",
+    "../../logs/server/",
+)
 
 
 async def handle_client(reader, writer):
     addr = writer.get_extra_info("peername")
-    print(f"Connected to {addr}")
+    logger.info(f"Connected to {addr}")
 
     try:
         while True:
-            print("Waiting for incoming data")
+            logger.info("Waiting for incoming data")
             incoming_data = await reader.read(16)
             if not incoming_data:
-                print("No data received, reset connection.")
+                logger.info("No data received, reset connection.")
                 break
 
             incoming_data = struct.unpack("ffff", incoming_data)
-            print(f"Received data from {addr}: {incoming_data}")
+            logger.info(
+                f"Received data from {addr[0]}:{addr[1]}. Package: {incoming_data}"
+            )
             new_ac_temp = compute_ac_adjustment(*incoming_data)
 
-            print(f"Sending new AC temp: {new_ac_temp}")
+            logger.info(f"Sending new AC temp: {new_ac_temp}")
             data_to_send = struct.pack("f", new_ac_temp)
             writer.write(data_to_send)
             await writer.drain()
 
     except asyncio.CancelledError:
-        print(f"Connection to {addr} closed.")
+        logger.info(f"Connection to {addr} closed.")
     finally:
         writer.close()
         await writer.wait_closed()
@@ -37,7 +58,7 @@ async def handle_client(reader, writer):
 async def main():
     server = await asyncio.start_server(handle_client, HOST, PORT)
     addr = server.sockets[0].getsockname()
-    print(f"Serving on {addr}")
+    logger.info(f"Serving on {addr}")
 
     async with server:
         await server.serve_forever()
